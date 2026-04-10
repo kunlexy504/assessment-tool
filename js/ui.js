@@ -111,6 +111,7 @@ function hideFooter() {
     const f = document.querySelector('.app-footer');
     if (f) f.style.display = 'none';
     document.getElementById('app').classList.remove('footer-visible');
+    if (typeof window._resetCookieSession === 'function') window._resetCookieSession();
 }
 
 // =====================================================
