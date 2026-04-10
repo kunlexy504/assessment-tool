@@ -138,6 +138,13 @@ body {
     background-color: var(--bg-primary);
     line-height: 1.6;
     transition: background-color 0.3s, color 0.3s;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+#app {
+    flex: 1;
 }
 
 /* Dashboard/app pages background — filtered image, does NOT affect login page */
