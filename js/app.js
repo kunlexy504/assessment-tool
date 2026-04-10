@@ -1677,20 +1677,20 @@ function renderSettingsTab(container) {
     // Session timeout setting
     const timeoutDiv = createEl('div', 'setting-item');
     const timeoutLabel = createEl('label');
-    timeoutLabel.textContent = `Session Timeout (seconds, current: ${settings.sessionTimeoutSeconds || 60})`;
+    timeoutLabel.textContent = `Session Timeout (seconds, current: ${settings.sessionTimeoutSeconds || 30})`;
     timeoutDiv.appendChild(timeoutLabel);
-    const timeoutInput = createEl('input', '', { type: 'number', min: '60', max: '7200' });
-    timeoutInput.value = settings.sessionTimeoutSeconds || 60;
+    const timeoutInput = createEl('input', '', { type: 'number', min: '30', max: '7200' });
+    timeoutInput.value = settings.sessionTimeoutSeconds || 30;
     timeoutInput.onchange = () => {
         const val = parseInt(timeoutInput.value);
-        if (val >= 60 && val <= 7200) {
+        if (val >= 30 && val <= 7200) {
             updateSettings({ sessionTimeoutSeconds: val });
             timeoutLabel.textContent = `Session Timeout (seconds, current: ${val})`;
             showNotification(`Session timeout updated to ${val} seconds`, 'success');
             initSessionTimeout(); // apply new value immediately
         } else {
-            showNotification('Timeout must be between 60 and 7200 seconds', 'error');
-            timeoutInput.value = settings.sessionTimeoutSeconds || 60;
+            showNotification('Timeout must be between 30 and 7200 seconds', 'error');
+            timeoutInput.value = settings.sessionTimeoutSeconds || 30;
         }
     };
     timeoutDiv.appendChild(timeoutInput);
@@ -1747,7 +1747,7 @@ function _resetSessionTimer() {
     // The warning is only removed by the "Stay Logged In" button — never by activity.
 
     const settings = getSettings();
-    const totalMs  = Math.max((settings.sessionTimeoutSeconds || 60), 60) * 1000;
+    const totalMs  = Math.max((settings.sessionTimeoutSeconds || 30), 30) * 1000;
     const warnMs   = Math.min(15 * 1000, totalMs * 0.25); // warn 15s before (or 25% of total)
 
     // Only schedule a new warning if one isn't already visible
