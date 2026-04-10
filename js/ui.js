@@ -88,6 +88,12 @@ function renderAppHeader() {
 
     headerContent.appendChild(navButtons);
     headerEl.appendChild(headerContent);
+
+    // Set CSS variable so sticky children can offset below this header
+    requestAnimationFrame(() => {
+        const h = headerEl.getBoundingClientRect().height;
+        document.documentElement.style.setProperty('--app-header-h', h + 'px');
+    });
 }
 
 function hideAppHeader() {

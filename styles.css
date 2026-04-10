@@ -620,7 +620,7 @@ textarea {
 
 .students-sticky-header {
     position: sticky;
-    top: 0;
+    top: var(--app-header-h, 0);
     z-index: 20;
     background-color: var(--bg-secondary);
     border-radius: 8px 8px 0 0;
@@ -928,24 +928,74 @@ body.dark-mode .student-item--selected {
     .students-controls-left   { order: 0; }
     .students-controls-right  { order: 1; flex-basis: 100%; justify-content: flex-end; }
 
-    /* Compact stat cards on mobile */
+    /* Compact sticky header */
+    .students-sticky-header {
+        padding: 10px 12px 0;
+    }
+
+    /* Smaller heading */
+    .students-heading-row h2 {
+        font-size: 15px;
+        font-weight: 600;
+    }
+
+    .students-heading-row {
+        margin-bottom: 10px;
+    }
+
+    /* Compact action buttons */
+    .students-header-btns {
+        gap: 6px;
+    }
+
+    .students-header-btns .btn {
+        font-size: 12px;
+        padding: 6px 10px;
+        border-radius: 6px;
+    }
+
+    /* Compact scheme tabs */
+    .scheme-tab {
+        padding: 5px 12px;
+        font-size: 12px;
+        border-radius: 6px 6px 0 0;
+    }
+
+    /* Compact stat cards */
     .students-stats-bar {
-        gap: 8px;
-        padding: 10px 0 14px;
+        gap: 6px;
+        padding: 8px 0 12px;
     }
 
     .students-stat-card {
-        padding: 10px 6px;
-        border-radius: 8px;
+        padding: 8px 4px;
+        border-radius: 6px;
     }
 
     .students-stat-card .stat-value {
-        font-size: 20px;
+        font-size: 18px;
     }
 
     .students-stat-card .stat-label {
-        font-size: 10px;
+        font-size: 9px;
         letter-spacing: 0;
+    }
+
+    /* Compact controls bar */
+    .students-controls-bar {
+        gap: 8px;
+        padding: 8px 0 10px;
+    }
+
+    .student-search-input {
+        font-size: 12px;
+        padding: 6px 12px;
+    }
+
+    .student-filter-btn,
+    .student-sort-select {
+        font-size: 12px;
+        padding: 5px 8px;
     }
 }
 
