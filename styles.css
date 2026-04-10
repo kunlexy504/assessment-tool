@@ -145,6 +145,7 @@ body {
 
 #app {
     flex: 1;
+    padding-bottom: 60px; /* space for fixed footer */
 }
 
 /* Dashboard/app pages background — filtered image, does NOT affect login page */
@@ -2572,8 +2573,12 @@ body.dark-mode #resume-work-modal p {
    ===================================== */
 
 .app-footer {
-    margin-top: 48px;
-    padding: 18px 20px;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 50;
+    padding: 12px 20px;
     background-color: var(--bg-secondary);
     border-top: 1px solid var(--border-color);
     text-align: center;
@@ -2729,8 +2734,7 @@ body.dark-mode .terms-modal-body h3 {
 /* Mobile footer */
 @media (max-width: 600px) {
     .app-footer {
-        margin-top: 32px;
-        padding: 14px 16px;
+        padding: 10px 12px;
     }
 
     .app-footer-inner {
