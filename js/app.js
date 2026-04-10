@@ -2355,12 +2355,9 @@ function renderAssessmentInterface() {
     const loCard = createEl('div', 'assessment-lo-card');
     const loTitle = createEl('h3', 'panel-heading');
     loTitle.textContent = `${currentLO.loNumber}: ${currentLO.title}`;
-    const loDesc = createEl('p');
-    loDesc.textContent = currentLO.description || 'No description provided.';
     const feedbackHint = createEl('p', 'assessment-hint');
     feedbackHint.textContent = 'Select a band score to apply and view mapped feedback.';
     loCard.appendChild(loTitle);
-    loCard.appendChild(loDesc);
     loCard.appendChild(feedbackHint);
     loSection.appendChild(loCard);
     content.appendChild(loSection);
