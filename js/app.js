@@ -1277,6 +1277,31 @@ function renderUsersManagementTab(container) {
 }
 
 /**
+ * Fully delete a user's Firestore data AND their Firebase Auth account
+ */
+async function _deleteAccountFromFirebase(uid) {
+    const { getDocs, deleteDoc, collection, doc } = window._firebaseFns;
+    const db   = window._db;
+    const auth = window._auth;
+
+    // 1. Delete all documents in every Firestore sub-collection
+    const cols = ['markingSchemes', 'students', 'assessmentResults'];
+    for (const col of cols) {
+        const snap = await getDocs(collection(db, `users/${uid}/${col}`));
+        await Promise.all(snap.docs.map(d => deleteDoc(d.ref)));
+    }
+
+    // 2. Delete single documents
+    await deleteDoc(doc(db, `users/${uid}/settings/app`)).catch(() => {});
+    await deleteDoc(doc(db, `users/${uid}/profile/data`)).catch(() => {});
+
+    // 3. Delete the Firebase Auth account (prevents re-login)
+    if (auth && auth.currentUser) {
+        await auth.currentUser.delete();
+    }
+}
+
+/**
  * Confirmation dialog before deleting own account and logging out
  */
 function _showDeleteSelfDialog(user) {
@@ -1323,12 +1348,17 @@ function _showDeleteSelfDialog(user) {
         deleteBtn.disabled = true;
         deleteBtn.textContent = 'Deleting…';
         try {
-            deleteUser(user.id);
+            await _deleteAccountFromFirebase(user.id);
             overlay.remove();
             showNotification('Account deleted. Logging out…', 'warning', 3000);
             setTimeout(() => logoutUser(), 1500);
         } catch (err) {
-            showNotification('Failed to delete account. Please try again.', 'error');
+            console.error('Account deletion error:', err);
+            if (err.code === 'auth/requires-recent-login') {
+                showNotification('For security, please log out and log back in, then try again.', 'error', 5000);
+            } else {
+                showNotification('Failed to delete account. Please try again.', 'error');
+            }
             deleteBtn.disabled = false;
             deleteBtn.textContent = 'Delete My Account';
         }
