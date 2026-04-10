@@ -943,15 +943,17 @@ body.dark-mode .student-item--selected {
         margin-bottom: 10px;
     }
 
-    /* Compact action buttons */
+    /* Compact action buttons — always side by side */
     .students-header-btns {
-        gap: 6px;
+        gap: 5px;
+        flex-wrap: nowrap;
     }
 
     .students-header-btns .btn {
-        font-size: 12px;
-        padding: 6px 10px;
+        font-size: 8px;
+        padding: 5px 5px;
         border-radius: 6px;
+        white-space: nowrap;
     }
 
     /* Compact scheme tabs */
