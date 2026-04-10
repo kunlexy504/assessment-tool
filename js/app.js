@@ -676,6 +676,7 @@ let _selectedStudentIds = new Set();
 let _studentFilter = 'all';     // 'all' | 'accessed' | 'not-accessed'
 let _studentSort   = 'date-desc'; // 'date-asc' | 'date-desc' | 'name-asc' | 'name-desc'
 let _studentSearch = '';
+let _studentScrollHandler = null; // tracks mobile scroll-away listener
 
 /**
  * Render student management tab (backend)
@@ -720,7 +721,9 @@ function renderStudentsManagementTab(container) {
     headingRow.appendChild(headerBtns);
     stickyHeader.appendChild(headingRow);
 
-    // ── Scheme tabs ────────────────────────────────────────────────────────
+    // ── Scheme tabs (scroll-away on mobile) ───────────────────────────────
+    const scrollAway = createEl('div', 'students-scroll-away');
+
     if (schemes.length > 0) {
         const tabsRow = createEl('div', 'scheme-tabs');
         schemes.forEach(scheme => {
@@ -728,14 +731,14 @@ function renderStudentsManagementTab(container) {
             tab.textContent = scheme.schemeName || 'Unnamed Scheme';
             tab.onclick = () => {
                 _activeSchemeId = scheme.id;
-                _selectedStudentIds.clear(); // reset selection when switching tabs
+                _selectedStudentIds.clear();
                 _studentSearch = '';
                 clearElement(container);
                 renderStudentsManagementTab(container);
             };
             tabsRow.appendChild(tab);
         });
-        stickyHeader.appendChild(tabsRow);
+        scrollAway.appendChild(tabsRow);
     }
 
     // ── Filter students by active scheme ───────────────────────────────────
@@ -881,9 +884,31 @@ function renderStudentsManagementTab(container) {
     controlsRight.appendChild(sortSelect);
     controlsBar.appendChild(controlsRight);
 
-    stickyHeader.appendChild(controlsBar);
+    scrollAway.appendChild(controlsBar);
 
     section.appendChild(stickyHeader);
+    section.appendChild(scrollAway);
+
+    // ── Mobile scroll-away animation ───────────────────────────────────────
+    if (_studentScrollHandler) {
+        window.removeEventListener('scroll', _studentScrollHandler);
+        _studentScrollHandler = null;
+    }
+    if (window.innerWidth <= 600) {
+        let lastScrollY = window.scrollY;
+        _studentScrollHandler = () => {
+            const y = window.scrollY;
+            const goingDown = y > lastScrollY;
+            lastScrollY = y;
+            const threshold = stickyHeader.offsetHeight || 80;
+            if (goingDown && y > threshold) {
+                scrollAway.classList.add('students-scroll-away--hidden');
+            } else if (!goingDown) {
+                scrollAway.classList.remove('students-scroll-away--hidden');
+            }
+        };
+        window.addEventListener('scroll', _studentScrollHandler, { passive: true });
+    }
 
     // ── Student list ───────────────────────────────────────────────────────
     if (students.length === 0) {

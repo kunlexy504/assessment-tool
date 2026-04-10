@@ -628,6 +628,21 @@ textarea {
     box-shadow: 0 2px 8px rgba(0,0,0,0.06);
 }
 
+/* Scroll-away wrapper — scheme tabs + controls */
+.students-scroll-away {
+    overflow: hidden;
+    max-height: 500px;
+    opacity: 1;
+    transform: translateY(0);
+    transition: max-height 0.35s ease, opacity 0.3s ease, transform 0.3s ease;
+}
+
+.students-scroll-away--hidden {
+    max-height: 0;
+    opacity: 0;
+    transform: translateY(-8px);
+}
+
 .students-heading-row {
     display: flex;
     align-items: center;
@@ -950,8 +965,8 @@ body.dark-mode .student-item--selected {
     }
 
     .students-header-btns .btn {
-        font-size: 8px;
-        padding: 5px 5px;
+        font-size: 12px;
+        padding: 8px 10px;
         border-radius: 6px;
         white-space: nowrap;
     }
@@ -2463,17 +2478,17 @@ select {
 
 @media (max-width: 768px) {
     .toggle-switch {
-        width: 100px;
-        height: 46px;
+        width: 44px;
+        height: 24px;
     }
     .toggle-knob {
-        top: 5px;
-        left: 5px;
-        width: 36px;
-        height: 36px;
+        top: 3px;
+        left: 3px;
+        width: 18px;
+        height: 18px;
     }
     .toggle-switch--on .toggle-knob {
-        transform: translateX(54px);
+        transform: translateX(20px);
     }
 }
 
