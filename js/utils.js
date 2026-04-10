@@ -52,7 +52,8 @@ function isValidPassword(password) {
  */
 function sanitizeInput(input) {
     if (typeof input !== 'string') return '';
-    return input.trim();
+    // Strip HTML tags to prevent stored XSS
+    return input.replace(/<[^>]*>/g, '').trim();
 }
 
 // =====================================================

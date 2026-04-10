@@ -3,22 +3,86 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Content Security Policy: restrict where scripts, styles, and connections can go -->
+    <meta http-equiv="Content-Security-Policy" content="
+        default-src 'self';
+        script-src 'self' 'unsafe-inline' https://www.gstatic.com https://apis.google.com;
+        style-src 'self' 'unsafe-inline';
+        connect-src 'self'
+            https://*.googleapis.com
+            https://*.firebaseio.com
+            https://*.firebasedatabase.app
+            https://identitytoolkit.googleapis.com
+            https://securetoken.googleapis.com;
+        frame-src https://accounts.google.com https://*.firebaseapp.com;
+        img-src 'self' data: https:;
+        object-src 'none';
+        base-uri 'self';
+    ">
     <title>Lecturer Assessment Tool</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <!-- Main Application Container -->
-    <div id="app" class="app-container"></div>
+    <div id="app" class="app-container">
+        <div style="display:flex;align-items:center;justify-content:center;height:100vh;flex-direction:column;gap:16px;font-family:sans-serif;color:#555;">
+            <div style="width:40px;height:40px;border:4px solid #e0e0e0;border-top-color:#4285f4;border-radius:50%;animation:spin 0.8s linear infinite;"></div>
+            <p style="margin:0;font-size:14px;">Loading...</p>
+        </div>
+    </div>
 
-    <!-- Scripts loaded in order of dependency -->
-    <script src="js/utils.js"></script>
-    <script src="js/storage.js"></script>
-    <script src="js/auth.js"></script>
-    <script src="js/markingScheme.js"></script>
-    <script src="js/studentManagement.js"></script>
-    <script src="js/assessment.js"></script>
-    <script src="js/feedforward.js"></script>
-    <script src="js/ui.js"></script>
-    <script src="js/app.js"></script>
+    <style>
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Google sign-in button */
+        .btn-google {
+            background: #111;
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        .btn-google:hover { background: #2a2a2a; border-color: rgba(255, 255, 255, 0.4); }
+
+        /* Divider between email login and Google */
+        .auth-divider {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            margin: 16px 0;
+            color: #888;
+            font-size: 13px;
+        }
+        .auth-divider::before,
+        .auth-divider::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid #ddd;
+        }
+        .auth-divider span { margin: 0 10px; }
+    </style>
+
+    <!--
+        Scripts loaded in dependency order.
+        All are regular (non-module) scripts so they share the global window scope.
+        firebase-config.js is a module and runs AFTER these have all executed,
+        once the browser has parsed the page (modules are deferred by default).
+    -->
+    <script src="js/utils.js?v=28"></script>
+    <script src="js/storage.js?v=28"></script>
+    <script src="js/auth.js?v=28"></script>
+    <script src="js/markingScheme.js?v=28"></script>
+    <script src="js/studentManagement.js?v=28"></script>
+    <script src="js/assessment.js?v=28"></script>
+    <script src="js/feedforward.js?v=28"></script>
+    <script src="js/ui.js?v=28"></script>
+    <script src="js/app.js?v=28"></script>
+
+    <!-- Firebase module — bootstraps the app via onAuthStateChanged -->
+    <script type="module" src="js/firebase-config.js"></script>
 </body>
 </html>

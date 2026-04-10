@@ -1,0 +1,6 @@
+name            = "lat-feedforward"
+main            = "index.js"
+compatibility_date = "2024-11-01"
+
+# After deploying, your Worker URL will be:
+# https://lat-feedforward.<your-cloudflare-subdomain>.workers.dev

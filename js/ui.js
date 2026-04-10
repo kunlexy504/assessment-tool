@@ -21,6 +21,8 @@
 function renderLoginPage() {
     const app = document.getElementById('app');
     clearElement(app);
+    // Clear any running inactivity timer on logout/login page
+    if (typeof clearSessionTimeout === 'function') clearSessionTimeout();
     
     const container = createEl('div', 'page login-page');
     
@@ -40,47 +42,17 @@ function renderLoginPage() {
     const form = createEl('form', 'login-form');
     form.onsubmit = (e) => handleLoginSubmit(e);
     
-    // Username input
+    // Email input
     const usernameLabel = createEl('label');
-    usernameLabel.textContent = 'Username';
+    usernameLabel.textContent = 'Email';
     const usernameInput = createEl('input', '', {
-        type: 'text',
-        id: 'login-username',
-        placeholder: 'Enter your username',
+        type: 'email',
+        id: 'login-email',
+        placeholder: 'Enter your email address',
         required: 'true'
     });
-    // Add focus event to clear placeholder
     usernameInput.addEventListener('focus', function() {
-        if (this.placeholder) {
-            this.placeholder = '';
-        }
-    });
-    // Add real-time validation
-    usernameInput.addEventListener('input', function() {
-        const username = sanitizeInput(this.value);
-        
-        if (!username) {
-            // Clear styling if empty
-            this.style.borderColor = '';
-            this.style.backgroundColor = '';
-            this.style.boxShadow = '';
-            return;
-        }
-        
-        // Check if user exists
-        const user = getUserByUsername(username);
-        
-        if (user) {
-            // User found - flash green
-            this.style.borderColor = '#28a745';
-            this.style.backgroundColor = '#d4edda';
-            this.style.boxShadow = '0 0 5px rgba(40, 167, 69, 0.5)';
-        } else {
-            // User not found - flash red
-            this.style.borderColor = '#dc3545';
-            this.style.backgroundColor = '#f8d7da';
-            this.style.boxShadow = '0 0 5px rgba(220, 53, 69, 0.5)';
-        }
+        if (this.placeholder) this.placeholder = '';
     });
     form.appendChild(usernameLabel);
     form.appendChild(usernameInput);
@@ -108,9 +80,21 @@ function renderLoginPage() {
     submitBtn.textContent = 'Login';
     submitBtn.type = 'submit';
     form.appendChild(submitBtn);
-    
+
     content.appendChild(form);
-    
+
+    // Google sign-in divider
+    const divider = createEl('div', 'auth-divider');
+    divider.innerHTML = '<span>or</span>';
+    content.appendChild(divider);
+
+    // Google sign-in button
+    const googleBtn = createEl('button', 'btn btn-google btn-full');
+    googleBtn.type = 'button';
+    googleBtn.innerHTML = '<img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" style="width:18px;height:18px;margin-right:8px;vertical-align:middle;">Continue with Google';
+    googleBtn.onclick = () => handleGoogleSignIn();
+    content.appendChild(googleBtn);
+
     // Reset password link
     const resetSection = createEl('div', 'auth-switch');
     const resetBtn = createEl('button', 'link');
@@ -151,125 +135,59 @@ function showResetPasswordDialog() {
     const closeBtn = createEl('button', 'modal-close');
     closeBtn.innerHTML = '&times;';
     closeBtn.onclick = () => modal.remove();
-    
+
     const title = createEl('h2');
-    title.textContent = 'Forgot Password';
-    
+    title.textContent = 'Reset Password';
+
     const message = createEl('p');
-    message.textContent = 'Enter your username below to verify your account. If your account exists, you will be provided with instructions to reset your password.';
+    message.textContent = 'Enter your email address and we\'ll send you a link to reset your password.';
     message.style.marginBottom = '20px';
     message.style.color = 'var(--text-secondary)';
-    
+
     const form = createEl('form', 'user-form');
-    
-    const usernameGroup = createEl('div', 'form-group');
-    const usernameLabel = createEl('label');
-    usernameLabel.textContent = 'Username';
-    const usernameInput = createEl('input', 'form-control');
-    usernameInput.type = 'text';
-    usernameInput.required = true;
-    usernameInput.placeholder = 'Enter your username';
-    usernameGroup.appendChild(usernameLabel);
-    usernameGroup.appendChild(usernameInput);
-    
+
+    const emailGroup = createEl('div', 'form-group');
+    const emailLabel = createEl('label');
+    emailLabel.textContent = 'Email';
+    const emailInput = createEl('input', 'form-control');
+    emailInput.type = 'email';
+    emailInput.required = true;
+    emailInput.placeholder = 'Enter your email address';
+    emailGroup.appendChild(emailLabel);
+    emailGroup.appendChild(emailInput);
+
     form.appendChild(message);
-    form.appendChild(usernameGroup);
-    
-    form.onsubmit = (e) => {
+    form.appendChild(emailGroup);
+
+    form.onsubmit = async (e) => {
         e.preventDefault();
-        const username = sanitizeInput(usernameInput.value);
-        
-        if (!username) {
-            showNotification('Username is required', 'error');
+        const email = sanitizeInput(emailInput.value);
+        if (!email) {
+            showNotification('Email is required', 'error');
             return;
         }
-        
-        // Find user by username
-        const user = getUserByUsername(username);
-        if (!user) {
-            showNotification('User not found. Please check your username or contact an administrator.', 'error');
-            return;
+        const result = await sendPasswordReset(email);
+        if (result.success) {
+            showNotification(result.message, 'success');
+            modal.remove();
+        } else {
+            showNotification(result.message, 'error');
         }
-        
-        // User found - show admin contact information
-        alert('User found! Please call the administrator at 07707342518 to reset your password. The admin will provide you with a default password to access your account.');
-        
-        // Show additional information in the modal
-        const resultDiv = createEl('div', 'reset-result');
-        resultDiv.style.marginTop = '20px';
-        resultDiv.style.padding = '15px';
-        resultDiv.style.backgroundColor = 'var(--bg-secondary)';
-        resultDiv.style.borderRadius = '4px';
-        resultDiv.style.border = '1px solid var(--border-color)';
-        
-        const resultTitle = createEl('h3');
-        resultTitle.textContent = 'Account Verified';
-        resultTitle.style.color = 'var(--success-color)';
-        resultTitle.style.marginBottom = '10px';
-        
-        const resultMessage = createEl('p');
-        resultMessage.textContent = 'Your account has been found in our system. Please contact the administrator using the phone number below to complete your password reset.';
-        resultMessage.style.marginBottom = '15px';
-        
-        const contactInfo = createEl('div', 'contact-info');
-        contactInfo.style.backgroundColor = 'var(--bg-tertiary)';
-        contactInfo.style.padding = '10px';
-        contactInfo.style.borderRadius = '4px';
-        contactInfo.style.textAlign = 'center';
-        
-        const phoneLabel = createEl('strong');
-        phoneLabel.textContent = 'Administrator Contact:';
-        phoneLabel.style.display = 'block';
-        phoneLabel.style.marginBottom = '5px';
-        
-        const phoneNumber = createEl('span');
-        phoneNumber.textContent = '07707342518';
-        phoneNumber.style.fontSize = '18px';
-        phoneNumber.style.fontWeight = 'bold';
-        phoneNumber.style.color = 'var(--primary-color)';
-        
-        contactInfo.appendChild(phoneLabel);
-        contactInfo.appendChild(phoneNumber);
-        
-        const note = createEl('p');
-        note.textContent = 'Note: The administrator will provide you with a default password (Pas$word098*) that you can use to log in and then change your password.';
-        note.style.fontSize = '12px';
-        note.style.color = 'var(--text-secondary)';
-        note.style.marginTop = '10px';
-        
-        resultDiv.appendChild(resultTitle);
-        resultDiv.appendChild(resultMessage);
-        resultDiv.appendChild(contactInfo);
-        resultDiv.appendChild(note);
-        
-        // Replace form content with result
-        form.innerHTML = '';
-        form.appendChild(resultDiv);
-        
-        // Change button to close
-        const buttonGroup = createEl('div', 'form-buttons');
-        const closeBtn = createEl('button', 'btn btn-primary');
-        closeBtn.type = 'button';
-        closeBtn.textContent = 'Close';
-        closeBtn.onclick = () => modal.remove();
-        
-        buttonGroup.appendChild(closeBtn);
-        form.appendChild(buttonGroup);
     };
-    
+
     const buttonGroup = createEl('div', 'form-buttons');
-    const checkBtn = createEl('button', 'btn btn-primary');
-    checkBtn.type = 'submit';
-    checkBtn.textContent = 'Check Username';
+    const sendBtn = createEl('button', 'btn btn-primary');
+    sendBtn.type = 'submit';
+    sendBtn.textContent = 'Send Reset Email';
     const cancelBtn = createEl('button', 'btn btn-secondary');
     cancelBtn.type = 'button';
     cancelBtn.textContent = 'Cancel';
     cancelBtn.onclick = () => modal.remove();
-    
-    buttonGroup.appendChild(checkBtn);
+
+    buttonGroup.appendChild(sendBtn);
     buttonGroup.appendChild(cancelBtn);
     form.appendChild(buttonGroup);
-    
+
     dialog.appendChild(closeBtn);
     dialog.appendChild(title);
     dialog.appendChild(form);
@@ -410,20 +328,17 @@ function renderRegistrationPage() {
     const form = createEl('form', 'auth-form');
     form.onsubmit = (e) => handleRegistrationSubmit(e);
     
-    // Username
+    // Email
     const usernameLabel = createEl('label');
-    usernameLabel.textContent = 'Username';
+    usernameLabel.textContent = 'Email';
     const usernameInput = createEl('input', '', {
-        type: 'text',
-        id: 'register-username',
-        placeholder: 'Choose username (min 3 chars)',
+        type: 'email',
+        id: 'register-email',
+        placeholder: 'Enter your email address',
         required: 'true'
     });
-    // Add focus event to clear placeholder
     usernameInput.addEventListener('focus', function() {
-        if (this.placeholder) {
-            this.placeholder = '';
-        }
+        if (this.placeholder) this.placeholder = '';
     });
     form.appendChild(usernameLabel);
     form.appendChild(usernameInput);
@@ -490,103 +405,62 @@ function renderRegistrationPage() {
 function renderPasswordResetPage() {
     const app = document.getElementById('app');
     clearElement(app);
-    
+
     const container = createEl('div', 'page registration-page');
-    
-    const content = createEl('div', 'auth-content');
-    
+    const content   = createEl('div', 'auth-content');
+
     // Header
     const header = createEl('div', 'auth-header');
-    const title = createEl('h1');
+    const title  = createEl('h1');
     title.textContent = 'Reset Password';
     const subtitle = createEl('p', 'subtitle');
-    subtitle.textContent = 'Enter your username to verify your account';
+    subtitle.textContent = 'Enter your email to receive a reset link';
     header.appendChild(title);
     header.appendChild(subtitle);
     content.appendChild(header);
-    
+
     // Form
     const form = createEl('form', 'auth-form');
-    form.onsubmit = (e) => {
+    form.onsubmit = async (e) => {
         e.preventDefault();
-        
-        const usernameInput = form.querySelector('input[name="username"]');
-        const username = sanitizeInput(usernameInput.value);
-        
-        if (!username) {
-            showNotification('Username is required', 'error');
+        const emailInput = form.querySelector('input[name="email"]');
+        const email = sanitizeInput(emailInput.value);
+        if (!email) {
+            showNotification('Email is required', 'error');
             return;
         }
-        
-        // Find user by username
-        const user = getUserByUsername(username);
-        if (!user) {
-            showNotification('User not found. Please check your username.', 'error');
-            return;
+        const result = await sendPasswordReset(email);
+        if (result.success) {
+            showNotification(result.message, 'success');
+            setTimeout(() => renderLoginPage(), 3000);
+        } else {
+            showNotification(result.message, 'error');
         }
-        
-        // Show admin contact message
-        showNotification('Account verified. Please contact Admin on 07707342518 to reset your password.', 'success');
-        setTimeout(() => {
-            renderLoginPage();
-        }, 3000);
     };
-    
-    // Username input
-    const usernameLabel = createEl('label');
-    usernameLabel.textContent = 'Username';
-    const usernameInput = createEl('input', '', {
-        type: 'text',
-        name: 'username',
-        placeholder: 'Enter your username',
+
+    // Email input
+    const emailLabel = createEl('label');
+    emailLabel.textContent = 'Email';
+    const emailInput = createEl('input', '', {
+        type: 'email',
+        name: 'email',
+        placeholder: 'Enter your email address',
         required: 'true'
     });
-    
-    // Add real-time validation
-    usernameInput.addEventListener('input', function() {
-        const username = sanitizeInput(this.value);
-        
-        if (!username) {
-            // Clear styling if empty
-            this.style.borderColor = '';
-            this.style.backgroundColor = '';
-            return;
-        }
-        
-        // Check if user exists
-        const user = getUserByUsername(username);
-        
-        if (user) {
-            // User found - flash green
-            this.style.borderColor = '#28a745';
-            this.style.backgroundColor = '#d4edda';
-            this.style.boxShadow = '0 0 5px rgba(40, 167, 69, 0.5)';
-        } else {
-            // User not found - flash red
-            this.style.borderColor = '#dc3545';
-            this.style.backgroundColor = '#f8d7da';
-            this.style.boxShadow = '0 0 5px rgba(220, 53, 69, 0.5)';
-        }
+    emailInput.addEventListener('focus', function() {
+        if (this.placeholder) this.placeholder = '';
     });
-    
-    // Add focus event to clear placeholder
-    usernameInput.addEventListener('focus', function() {
-        if (this.placeholder) {
-            this.placeholder = '';
-        }
-    });
-    
-    form.appendChild(usernameLabel);
-    form.appendChild(usernameInput);
-    
+    form.appendChild(emailLabel);
+    form.appendChild(emailInput);
+
     // Submit button
     const submitBtn = createEl('button', 'btn btn-primary btn-full');
-    submitBtn.textContent = 'Verify Username';
+    submitBtn.textContent = 'Send Reset Email';
     submitBtn.type = 'submit';
     form.appendChild(submitBtn);
-    
+
     content.appendChild(form);
-    
+
     // Back to login
     const backSection = createEl('div', 'auth-switch');
     const backLink = createEl('a', 'link');
@@ -594,7 +468,7 @@ function renderPasswordResetPage() {
     backLink.onclick = () => renderLoginPage();
     backSection.appendChild(backLink);
     content.appendChild(backSection);
-    
+
     container.appendChild(content);
     app.appendChild(container);
 }
@@ -605,16 +479,25 @@ function renderPasswordResetPage() {
 function renderBackendPanel() {
     const app = document.getElementById('app');
     clearElement(app);
+    // Start (or restart) inactivity timeout when the panel loads
+    if (typeof initSessionTimeout === 'function') initSessionTimeout();
     
     const container = createEl('div', 'page backend-page');
     
     // Header with navigation
     const header = createEl('header', 'backend-header');
     const headerContent = createEl('div', 'header-content');
-    
-    const title = createEl('h1');
-    title.textContent = 'Lecturer Dashboard';
-    headerContent.appendChild(title);
+
+    // Avatar + Welcome message
+    const currentUser = getCurrentUser();
+    const welcomeWrap = createEl('div', 'header-welcome');
+    if (currentUser) {
+        welcomeWrap.appendChild(_renderAvatarCircle(currentUser.avatar || 'av1', 40));
+        const welcomeText = createEl('span', 'header-welcome-text');
+        welcomeText.textContent = `Welcome, ${currentUser.displayName || currentUser.username || currentUser.email}`;
+        welcomeWrap.appendChild(welcomeText);
+    }
+    headerContent.appendChild(welcomeWrap);
     
     const navButtons = createEl('div', 'header-nav');
     
@@ -749,12 +632,17 @@ function renderMarkingSchemesTab(container) {
             item.appendChild(info);
             
             const actions = createEl('div', 'scheme-actions');
-            
+
+            const duplicateBtn = createEl('button', 'btn btn-secondary btn-sm');
+            duplicateBtn.textContent = 'Duplicate';
+            duplicateBtn.onclick = () => duplicateMarkingScheme(scheme.id);
+            actions.appendChild(duplicateBtn);
+
             const editBtn = createEl('button', 'btn btn-secondary btn-sm');
             editBtn.textContent = 'Edit';
             editBtn.onclick = () => renderEditMarkingSchemeForm(scheme.id);
             actions.appendChild(editBtn);
-            
+
             const deleteBtn = createEl('button', 'btn btn-danger btn-sm');
             deleteBtn.textContent = 'Delete';
             deleteBtn.onclick = () => confirmDeleteScheme(scheme.id);
@@ -771,38 +659,24 @@ function renderMarkingSchemesTab(container) {
 }
 
 /**
- * Render create marking scheme form with MANUAL ENTRY and FILE UPLOAD options
+ * Render create marking scheme form — Manual Entry only
  */
 function renderCreateMarkingSchemeForm() {
     const modal = createEl('div', 'modal-overlay');
-    
+
     const dialog = createEl('div', 'modal-dialog');
-    
+
     const closeBtn = createEl('button', 'modal-close');
     closeBtn.innerHTML = '&times;';
     closeBtn.onclick = () => modal.remove();
     dialog.appendChild(closeBtn);
-    
+
     const title = createEl('h2');
     title.textContent = 'Create Marking Scheme';
     dialog.appendChild(title);
-    
-    // Create tabs for two options
-    const optionTabs = createEl('div', 'option-tabs');
-    
-    const manualTab = createEl('button', 'btn btn-secondary tab-button active');
-    manualTab.textContent = 'Manual Entry';
-    
-    const uploadTab = createEl('button', 'btn btn-secondary tab-button');
-    uploadTab.textContent = 'Upload File';
-    
-    optionTabs.appendChild(manualTab);
-    optionTabs.appendChild(uploadTab);
-    dialog.appendChild(optionTabs);
-    
+
     // ===== MANUAL ENTRY FORM =====
     const manualForm = createEl('form', 'scheme-form manual-form');
-    manualForm.style.display = 'block';
     manualForm.onsubmit = (e) => {
         e.preventDefault();
         handleCreateMarkingScheme(manualForm);
@@ -876,6 +750,7 @@ function renderCreateMarkingSchemeForm() {
     addBandBtn.onclick = (e) => {
         e.preventDefault();
         addBandScoreRow(bandContainer);
+        updateAllLOFeedbackSections(manualForm);
     };
     bandSection.appendChild(addBandBtn);
 
@@ -911,108 +786,6 @@ function renderCreateMarkingSchemeForm() {
     manualForm.appendChild(submitBtn);
 
     dialog.appendChild(manualForm);
-    
-    // ===== FILE UPLOAD FORM =====
-    const uploadForm = createEl('form', 'scheme-form upload-form');
-    uploadForm.style.display = 'none';
-    uploadForm.onsubmit = (e) => {
-        e.preventDefault();
-        handleFileUploadScheme(uploadForm);
-        modal.remove();
-    };
-    
-    // File input
-    const fileLabel = createEl('label');
-    fileLabel.textContent = 'Select Marking Scheme File *';
-    const fileInput = createEl('input', '', {
-        type: 'file',
-        accept: '.docx,.pdf',
-        required: 'true',
-        id: 'scheme-file-input'
-    });
-    uploadForm.appendChild(fileLabel);
-    uploadForm.appendChild(fileInput);
-    
-    // Scheme Name from file (COMPULSORY)
-    const uploadSchemeNameLabel = createEl('label');
-    uploadSchemeNameLabel.textContent = 'Scheme Name *';
-    const uploadSchemeNameInput = createEl('input', '', {
-        type: 'text',
-        required: 'true',
-        placeholder: 'Name for this scheme'
-    });
-    // Add focus event to clear placeholder
-    uploadSchemeNameInput.addEventListener('focus', function() {
-        if (this.placeholder) {
-            this.placeholder = '';
-        }
-    });
-    uploadForm.appendChild(uploadSchemeNameLabel);
-    uploadForm.appendChild(uploadSchemeNameInput);
-    
-    // Course Name (COMPULSORY)
-    const uploadCourseLabel = createEl('label');
-    uploadCourseLabel.textContent = 'Course Name *';
-    const uploadCourseInput = createEl('input', '', {
-        type: 'text',
-        required: 'true',
-        placeholder: 'e.g., Business 101'
-    });
-    // Add focus event to clear placeholder
-    uploadCourseInput.addEventListener('focus', function() {
-        if (this.placeholder) {
-            this.placeholder = '';
-        }
-    });
-    uploadForm.appendChild(uploadCourseLabel);
-    uploadForm.appendChild(uploadCourseInput);
-    
-    // Institution (OPTIONAL)
-    const uploadInstitutionLabel = createEl('label');
-    uploadInstitutionLabel.textContent = 'Institution (Optional)';
-    const uploadInstitutionInput = createEl('input', '', {
-        type: 'text',
-        placeholder: 'e.g., University of Example'
-    });
-    // Add focus event to clear placeholder
-    uploadInstitutionInput.addEventListener('focus', function() {
-        if (this.placeholder) {
-            this.placeholder = '';
-        }
-    });
-    uploadForm.appendChild(uploadInstitutionLabel);
-    uploadForm.appendChild(uploadInstitutionInput);
-    
-    // Info message
-    const infoMsg = createEl('p', 'info-message');
-    infoMsg.textContent = '📄 Upload a DOCX or PDF file containing your marking scheme. The system will extract Learning Outcomes and Band Scores.';
-    uploadForm.appendChild(infoMsg);
-    
-    // Submit button
-    const uploadSubmitBtn = createEl('button', 'btn btn-primary');
-    uploadSubmitBtn.textContent = 'Upload & Create Scheme';
-    uploadSubmitBtn.type = 'submit';
-    uploadForm.appendChild(uploadSubmitBtn);
-    
-    dialog.appendChild(uploadForm);
-    
-    // ===== TAB SWITCHING =====
-    manualTab.onclick = (e) => {
-        e.preventDefault();
-        manualForm.style.display = 'block';
-        uploadForm.style.display = 'none';
-        manualTab.classList.add('active');
-        uploadTab.classList.remove('active');
-    };
-    
-    uploadTab.onclick = (e) => {
-        e.preventDefault();
-        manualForm.style.display = 'none';
-        uploadForm.style.display = 'block';
-        uploadTab.classList.add('active');
-        manualTab.classList.remove('active');
-    };
-    
     modal.appendChild(dialog);
     document.body.appendChild(modal);
 }
@@ -1093,10 +866,16 @@ function addBandScoreRow(container, bandScore) {
     const row = createEl('div', 'band-row');
     row.setAttribute('data-band-id', bandScore ? bandScore.id : generateUniqueId());
 
+    const _existingNums = Array.from(container.querySelectorAll('.band-number'))
+        .map(inp => parseInt(inp.value, 10) || 0);
+    const _nextBandNum = bandScore
+        ? bandScore.bandNumber
+        : (_existingNums.length > 0 ? Math.max(..._existingNums) + 1 : 1);
+
     const number = createEl('input', 'band-number', {
         type: 'number',
         min: '1',
-        value: bandScore ? bandScore.bandNumber : (container.children.length + 1),
+        value: _nextBandNum,
         readonly: 'true'
     });
 
@@ -1288,8 +1067,8 @@ function addLearningOutcomeRow(container, lo) {
         bandRows.forEach(bandRow => {
             const bandNumber = bandRow.querySelector('.band-number').value;
             const bandLabel = bandRow.querySelector('.band-label').value;
-            if (bandNumber && bandLabel) {
-                bands.push({ number: bandNumber, label: bandLabel });
+            if (bandNumber) {
+                bands.push({ number: bandNumber, label: bandLabel || `Band ${bandNumber}` });
             }
         });
         return bands;

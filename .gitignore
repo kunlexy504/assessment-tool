@@ -1,0 +1,11 @@
+# Firebase sensitive config — deploy manually via `firebase deploy`, never commit
+js/firebase-config.js
+
+# Firebase local cache
+.firebase/
+
+# Cloudflare Wrangler cache (contains account ID)
+feedforward-worker/.wrangler/
+
+# Dependencies
+node_modules/

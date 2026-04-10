@@ -327,22 +327,16 @@ function createDemoMarkingScheme(userId) {
         )
     ];
     
-    // Create scheme
-    const db = getDatabase();
-    const scheme = deepCopy(DEFAULT_MARKING_SCHEME);
-    scheme.id = generateUniqueId();
-    scheme.createdByUserId = userId;
-    scheme.schemeName = 'Governance, Law & Ethics (Demo)';
-    scheme.institution = 'York St. John University';
-    scheme.courseCode = 'GLK101';
-    scheme.courseName = 'Governance, Law and Ethics';
-    scheme.bandScores = bandScores;
-    scheme.learningOutcomes = learningOutcomes;
-    scheme.createdAt = new Date().toISOString();
-    
-    db.markingSchemes.push(scheme);
-    saveDatabase(db);
-    
+    // Create scheme and save to Firestore so it persists across reloads
+    const scheme = createMarkingScheme(userId, {
+        schemeName: 'Governance, Law & Ethics (Demo)',
+        institution: 'York St. John University',
+        courseCode: 'GLK101',
+        courseName: 'Governance, Law and Ethics',
+        bandScores: bandScores,
+        learningOutcomes: learningOutcomes,
+    });
+
     console.log('Demo marking scheme created');
     return scheme;
 }
