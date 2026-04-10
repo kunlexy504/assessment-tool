@@ -2559,3 +2559,196 @@ body.dark-mode #resume-work-modal h2,
 body.dark-mode #resume-work-modal p {
     color: #fff;
 }
+
+/* =====================================
+   APP FOOTER
+   ===================================== */
+
+.app-footer {
+    margin-top: 48px;
+    padding: 18px 20px;
+    background-color: var(--bg-secondary);
+    border-top: 1px solid var(--border-color);
+    text-align: center;
+}
+
+.app-footer-inner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    flex-wrap: wrap;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.footer-linkedin {
+    display: flex;
+    align-items: center;
+    color: #0a66c2;
+    transition: color 0.2s, transform 0.2s;
+    flex-shrink: 0;
+}
+.footer-linkedin:hover {
+    color: #004182;
+    transform: translateY(-2px);
+}
+
+.footer-copy {
+    font-size: 12px;
+    color: var(--text-secondary);
+    text-align: center;
+}
+
+.footer-terms-btn {
+    background: none;
+    border: none;
+    font-size: 12px;
+    color: var(--primary-color);
+    cursor: pointer;
+    padding: 0;
+    text-decoration: underline;
+    flex-shrink: 0;
+}
+.footer-terms-btn:hover { opacity: 0.75; }
+
+/* =====================================
+   TERMS & POLICY MODAL
+   ===================================== */
+
+.terms-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.55);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+}
+
+.terms-modal-box {
+    background: var(--bg-primary, #fff);
+    border-radius: 10px;
+    width: 100%;
+    max-width: 680px;
+    max-height: 88vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.25);
+    overflow: hidden;
+}
+
+.terms-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 24px 14px;
+    border-bottom: 1px solid var(--border-color, #e8eaed);
+    flex-shrink: 0;
+}
+
+.terms-modal-header h2 {
+    margin: 0;
+    font-size: 17px;
+    color: var(--text-primary, #1a1a1a);
+}
+
+.terms-modal-close {
+    background: none;
+    border: none;
+    font-size: 22px;
+    cursor: pointer;
+    color: var(--text-secondary, #666);
+    line-height: 1;
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+.terms-modal-close:hover { background: rgba(0,0,0,0.07); }
+
+.terms-modal-body {
+    padding: 20px 24px;
+    overflow-y: auto;
+    flex: 1;
+    font-size: 13.5px;
+    line-height: 1.65;
+    color: var(--text-primary, #1a1a1a);
+}
+
+.terms-effective {
+    font-size: 12px;
+    color: var(--text-secondary, #666);
+    margin-bottom: 18px;
+}
+
+.terms-modal-body h3 {
+    font-size: 14px;
+    font-weight: 600;
+    margin: 20px 0 6px;
+    color: var(--text-primary, #1a1a1a);
+}
+
+.terms-modal-body p { margin: 0 0 10px; }
+
+.terms-modal-body ul {
+    margin: 6px 0 10px 20px;
+    padding: 0;
+}
+.terms-modal-body ul li { margin-bottom: 4px; }
+
+.terms-modal-body a {
+    color: var(--primary-color, #0066cc);
+    text-decoration: underline;
+}
+
+.terms-modal-footer {
+    padding: 14px 24px;
+    border-top: 1px solid var(--border-color, #e8eaed);
+    display: flex;
+    justify-content: flex-end;
+    flex-shrink: 0;
+}
+
+/* Dark mode support */
+body.dark-mode .terms-modal-box {
+    background: var(--bg-secondary);
+}
+body.dark-mode .terms-modal-header h2,
+body.dark-mode .terms-modal-body,
+body.dark-mode .terms-modal-body h3 {
+    color: #f0f0f0;
+}
+
+/* Mobile footer */
+@media (max-width: 600px) {
+    .app-footer {
+        margin-top: 32px;
+        padding: 14px 16px;
+    }
+
+    .app-footer-inner {
+        gap: 10px;
+    }
+
+    .footer-copy {
+        font-size: 11px;
+        order: 1;
+        flex-basis: 100%;
+    }
+
+    .footer-linkedin { order: 0; }
+    .footer-terms-btn { order: 2; font-size: 11px; }
+
+    .terms-modal-body {
+        font-size: 13px;
+        padding: 16px;
+    }
+
+    .terms-modal-header {
+        padding: 14px 16px 12px;
+    }
+
+    .terms-modal-footer {
+        padding: 12px 16px;
+    }
+}
