@@ -2338,7 +2338,8 @@ function renderAssessmentInterface() {
         return;
     }
 
-    const main = document.getElementById('app');
+    renderAppHeader();
+    const main = document.getElementById('app-content');
     clearElement(main);
 
     const container = createEl('div', 'assessment-page');
@@ -2452,7 +2453,8 @@ function renderAssessmentSummary() {
     const summary = getAssessmentSummary();
     const progress = getAssessmentProgress();
 
-    const main = document.getElementById('app');
+    renderAppHeader();
+    const main = document.getElementById('app-content');
     clearElement(main);
 
     const container = createEl('div', 'assessment-summary');
@@ -2525,7 +2527,8 @@ function renderStudentReview(studentId) {
         return;
     }
 
-    const main = document.getElementById('app');
+    renderAppHeader();
+    const main = document.getElementById('app-content');
     clearElement(main);
 
     // ── Page wrapper ────────────────────────────────────────────────────

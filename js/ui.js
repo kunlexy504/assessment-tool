@@ -12,6 +12,59 @@
  */
 
 // =====================================================
+// PERSISTENT APP HEADER
+// =====================================================
+
+function renderAppHeader() {
+    const headerEl = document.getElementById('app-header');
+    if (!headerEl) return;
+    clearElement(headerEl);
+    headerEl.style.display = '';
+
+    const currentUser = getCurrentUser();
+    const headerContent = createEl('div', 'header-content');
+
+    const welcomeWrap = createEl('div', 'header-welcome');
+    if (currentUser) {
+        welcomeWrap.appendChild(_renderAvatarCircle(currentUser.avatar || 'av1', 40));
+        const welcomeText = createEl('span', 'header-welcome-text');
+        welcomeText.textContent = `Welcome, ${currentUser.displayName || currentUser.username || currentUser.email}`;
+        welcomeWrap.appendChild(welcomeText);
+    }
+    headerContent.appendChild(welcomeWrap);
+
+    const navButtons = createEl('div', 'header-nav');
+
+    const tabs = [
+        { label: 'Marking Schemes', tab: 'schemes' },
+        { label: 'Students',        tab: 'students' },
+        { label: 'Users',           tab: 'users' },
+        { label: 'Settings',        tab: 'settings' },
+    ];
+
+    tabs.forEach(({ label, tab }) => {
+        const btn = createEl('button', 'btn btn-secondary');
+        btn.textContent = label;
+        btn.onclick = () => { renderBackendPanel(); showBackendTab(tab); };
+        navButtons.appendChild(btn);
+    });
+
+    const logoutBtn = createEl('button', 'btn btn-danger');
+    logoutBtn.textContent = 'Logout';
+    logoutBtn.onclick = () => handleLogout();
+    navButtons.appendChild(logoutBtn);
+
+    headerContent.appendChild(navButtons);
+    headerEl.appendChild(headerContent);
+    headerEl.className = 'backend-header';
+}
+
+function hideAppHeader() {
+    const headerEl = document.getElementById('app-header');
+    if (headerEl) { headerEl.style.display = 'none'; clearElement(headerEl); }
+}
+
+// =====================================================
 // PAGE RENDERING FUNCTIONS
 // =====================================================
 
@@ -19,7 +72,8 @@
  * Render login page
  */
 function renderLoginPage() {
-    const app = document.getElementById('app');
+    hideAppHeader();
+    const app = document.getElementById('app-content');
     clearElement(app);
     // Clear any running inactivity timer on logout/login page
     if (typeof clearSessionTimeout === 'function') clearSessionTimeout();
@@ -310,7 +364,8 @@ function showChangePasswordDialog(user) {
  * Render registration page
  */
 function renderRegistrationPage() {
-    const app = document.getElementById('app');
+    hideAppHeader();
+    const app = document.getElementById('app-content');
     clearElement(app);
     
     const container = createEl('div', 'page registration-page');
@@ -403,7 +458,8 @@ function renderRegistrationPage() {
  * Render password reset page
  */
 function renderPasswordResetPage() {
-    const app = document.getElementById('app');
+    hideAppHeader();
+    const app = document.getElementById('app-content');
     clearElement(app);
 
     const container = createEl('div', 'page registration-page');
@@ -477,66 +533,21 @@ function renderPasswordResetPage() {
  * Render backend admin panel
  */
 function renderBackendPanel() {
-    const app = document.getElementById('app');
+    renderAppHeader();
+    const app = document.getElementById('app-content');
     clearElement(app);
     // Start (or restart) inactivity timeout when the panel loads
     if (typeof initSessionTimeout === 'function') initSessionTimeout();
-    
-    const container = createEl('div', 'page backend-page');
-    
-    // Header with navigation
-    const header = createEl('header', 'backend-header');
-    const headerContent = createEl('div', 'header-content');
 
-    // Avatar + Welcome message
-    const currentUser = getCurrentUser();
-    const welcomeWrap = createEl('div', 'header-welcome');
-    if (currentUser) {
-        welcomeWrap.appendChild(_renderAvatarCircle(currentUser.avatar || 'av1', 40));
-        const welcomeText = createEl('span', 'header-welcome-text');
-        welcomeText.textContent = `Welcome, ${currentUser.displayName || currentUser.username || currentUser.email}`;
-        welcomeWrap.appendChild(welcomeText);
-    }
-    headerContent.appendChild(welcomeWrap);
-    
-    const navButtons = createEl('div', 'header-nav');
-    
-    const schemeBtn = createEl('button', 'btn btn-secondary');
-    schemeBtn.textContent = 'Marking Schemes';
-    schemeBtn.onclick = () => showBackendTab('schemes');
-    navButtons.appendChild(schemeBtn);
-    
-    const studentsBtn = createEl('button', 'btn btn-secondary');
-    studentsBtn.textContent = 'Students';
-    studentsBtn.onclick = () => showBackendTab('students');
-    navButtons.appendChild(studentsBtn);
-    
-    const usersBtn = createEl('button', 'btn btn-secondary');
-    usersBtn.textContent = 'Users';
-    usersBtn.onclick = () => showBackendTab('users');
-    navButtons.appendChild(usersBtn);
-    
-    const settingsBtn = createEl('button', 'btn btn-secondary');
-    settingsBtn.textContent = 'Settings';
-    settingsBtn.onclick = () => showBackendTab('settings');
-    navButtons.appendChild(settingsBtn);
-    
-    const logoutBtn = createEl('button', 'btn btn-danger');
-    logoutBtn.textContent = 'Logout';
-    logoutBtn.onclick = () => handleLogout();
-    navButtons.appendChild(logoutBtn);
-    
-    headerContent.appendChild(navButtons);
-    header.appendChild(headerContent);
-    container.appendChild(header);
-    
+    const container = createEl('div', 'page backend-page');
+
     // Main content area
     const mainContent = createEl('main', 'backend-main');
     mainContent.id = 'backend-content';
     container.appendChild(mainContent);
-    
+
     app.appendChild(container);
-    
+
     // Show default tab
     showBackendTab('schemes');
 }
