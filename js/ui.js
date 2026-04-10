@@ -104,11 +104,13 @@ function hideAppHeader() {
 function showFooter() {
     const f = document.querySelector('.app-footer');
     if (f) f.style.display = '';
+    document.getElementById('app').classList.add('footer-visible');
 }
 
 function hideFooter() {
     const f = document.querySelector('.app-footer');
     if (f) f.style.display = 'none';
+    document.getElementById('app').classList.remove('footer-visible');
 }
 
 // =====================================================

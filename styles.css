@@ -145,7 +145,10 @@ body {
 
 #app {
     flex: 1;
-    padding-bottom: 90px; /* space for fixed footer + breathing room */
+}
+
+#app.footer-visible {
+    padding-bottom: 90px;
 }
 
 /* Dashboard/app pages background — filtered image, does NOT affect login page */
