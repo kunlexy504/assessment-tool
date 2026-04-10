@@ -20,10 +20,12 @@ function renderAppHeader() {
     if (!headerEl) return;
     clearElement(headerEl);
     headerEl.style.display = '';
+    headerEl.className = 'backend-header';
 
     const currentUser = getCurrentUser();
     const headerContent = createEl('div', 'header-content');
 
+    // Avatar + welcome
     const welcomeWrap = createEl('div', 'header-welcome');
     if (currentUser) {
         welcomeWrap.appendChild(_renderAvatarCircle(currentUser.avatar || 'av1', 40));
@@ -33,6 +35,13 @@ function renderAppHeader() {
     }
     headerContent.appendChild(welcomeWrap);
 
+    // Hamburger button (mobile only)
+    const hamburger = createEl('button', 'hamburger-btn');
+    hamburger.setAttribute('aria-label', 'Toggle navigation');
+    for (let i = 0; i < 3; i++) hamburger.appendChild(createEl('span', 'hamburger-line'));
+    headerContent.appendChild(hamburger);
+
+    // Nav buttons
     const navButtons = createEl('div', 'header-nav');
 
     const tabs = [
@@ -45,18 +54,40 @@ function renderAppHeader() {
     tabs.forEach(({ label, tab }) => {
         const btn = createEl('button', 'btn btn-secondary');
         btn.textContent = label;
-        btn.onclick = () => { renderBackendPanel(); showBackendTab(tab); };
+        btn.onclick = () => {
+            headerEl.classList.remove('nav-open');
+            hamburger.classList.remove('is-open');
+            renderBackendPanel();
+            showBackendTab(tab);
+        };
         navButtons.appendChild(btn);
     });
 
     const logoutBtn = createEl('button', 'btn btn-danger');
     logoutBtn.textContent = 'Logout';
-    logoutBtn.onclick = () => handleLogout();
+    logoutBtn.onclick = () => {
+        headerEl.classList.remove('nav-open');
+        hamburger.classList.remove('is-open');
+        handleLogout();
+    };
     navButtons.appendChild(logoutBtn);
+
+    // Toggle hamburger
+    hamburger.onclick = () => {
+        const open = headerEl.classList.toggle('nav-open');
+        hamburger.classList.toggle('is-open', open);
+    };
+
+    // Close when clicking outside
+    document.addEventListener('click', (e) => {
+        if (!headerEl.contains(e.target)) {
+            headerEl.classList.remove('nav-open');
+            hamburger.classList.remove('is-open');
+        }
+    }, { capture: false });
 
     headerContent.appendChild(navButtons);
     headerEl.appendChild(headerContent);
-    headerEl.className = 'backend-header';
 }
 
 function hideAppHeader() {

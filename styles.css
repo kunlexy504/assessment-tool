@@ -550,6 +550,52 @@ textarea {
     box-shadow: 0 6px 12px rgba(0, 102, 204, 0.4);
 }
 
+/* ── Hamburger button (hidden on desktop, shown via media query) ── */
+.hamburger-btn {
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+    width: 40px;
+    height: 40px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 6px;
+    flex-shrink: 0;
+}
+
+.hamburger-btn:hover { background: rgba(255,255,255,0.08); }
+
+.hamburger-line {
+    display: block;
+    width: 22px;
+    height: 2px;
+    background-color: var(--text-primary);
+    border-radius: 2px;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+    transform-origin: center;
+}
+
+/* Animate to X when open */
+.hamburger-btn.is-open .hamburger-line:nth-child(1) {
+    transform: translateY(7px) rotate(45deg);
+}
+.hamburger-btn.is-open .hamburger-line:nth-child(2) {
+    opacity: 0;
+    transform: scaleX(0);
+}
+.hamburger-btn.is-open .hamburger-line:nth-child(3) {
+    transform: translateY(-7px) rotate(-45deg);
+}
+
+/* Make header position relative so dropdown anchors to it */
+.backend-header {
+    position: relative;
+}
+
 .backend-main {
     max-width: 1200px;
     margin: 0 auto;
@@ -881,6 +927,26 @@ body.dark-mode .student-item--selected {
     .students-controls-center { order: -1; flex-basis: 100%; }
     .students-controls-left   { order: 0; }
     .students-controls-right  { order: 1; flex-basis: 100%; justify-content: flex-end; }
+
+    /* Compact stat cards on mobile */
+    .students-stats-bar {
+        gap: 8px;
+        padding: 10px 0 14px;
+    }
+
+    .students-stat-card {
+        padding: 10px 6px;
+        border-radius: 8px;
+    }
+
+    .students-stat-card .stat-value {
+        font-size: 20px;
+    }
+
+    .students-stat-card .stat-label {
+        font-size: 10px;
+        letter-spacing: 0;
+    }
 }
 
 /* ===================================== 
@@ -1739,25 +1805,50 @@ select {
         max-height: 180px;
     }
 
-    /* Header: stretch full width */
+    /* Header: hamburger takes over on tablet/mobile */
     .header-content {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 12px;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: nowrap;
+    }
+
+    .hamburger-btn {
+        display: flex;
     }
 
     .header-nav {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
-        gap: 8px;
-        width: 100%;
+        display: none;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background-color: var(--bg-secondary);
+        border-top: 1px solid var(--border-color);
+        border-bottom: 2px solid var(--primary-color);
+        flex-direction: column;
+        padding: 8px 12px 12px;
+        gap: 6px;
+        box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+        z-index: 200;
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.35s ease, padding 0.35s ease;
+    }
+
+    #app-header.nav-open .header-nav {
+        display: flex;
+        max-height: 400px;
+        padding: 8px 12px 14px;
     }
 
     .header-nav .btn {
         margin: 0;
-        font-size: 13px;
-        padding: 10px 8px;
-        min-width: 0;
+        width: 100%;
+        font-size: 14px;
+        padding: 11px 16px;
+        text-align: left;
+        border-radius: 6px;
     }
 
     /* List items: stack info + actions vertically */
@@ -1897,11 +1988,7 @@ select {
 
     /* Header */
     .backend-header {
-        padding: 12px;
-    }
-
-    .header-nav {
-        grid-template-columns: repeat(2, 1fr);
+        padding: 10px 14px;
     }
 
     /* Button groups */
