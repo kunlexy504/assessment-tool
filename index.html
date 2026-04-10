@@ -268,19 +268,13 @@
             localStorage.setItem(COOKIE_KEY, JSON.stringify({ ...prefs, timestamp: Date.now() }));
         }
 
-        let _cookieShownThisSession = false;
-
         function _initCookieBanner() {
-            if (_cookieShownThisSession) return; // don't re-show on tab switches
-            _cookieShownThisSession = true;
-            setTimeout(() => {
-                document.getElementById('cookie-banner').style.display = 'flex';
-            }, 800);
-        }
-
-        function _resetCookieSession() {
-            _cookieShownThisSession = false;
-            document.getElementById('cookie-banner').style.display = 'none';
+            // Only show if no consent stored — i.e. first ever visit or after clearing browser data
+            if (!_loadConsent()) {
+                setTimeout(() => {
+                    document.getElementById('cookie-banner').style.display = 'flex';
+                }, 800);
+            }
         }
 
         function cookieAcceptAll() {
@@ -315,9 +309,8 @@
         }
 
         // Expose functions globally
-        window.openCookieSettings   = openCookieSettings;
-        window._initCookieBanner    = _initCookieBanner;   // called after login
-        window._resetCookieSession  = _resetCookieSession; // called on logout
+        window.openCookieSettings = openCookieSettings;
+        window._initCookieBanner  = _initCookieBanner; // called after login
 
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') closeCookieSettings();
