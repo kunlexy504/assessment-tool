@@ -1218,7 +1218,15 @@ function renderUsersManagementTab(container) {
             editPasswordBtn.textContent = 'Edit Password';
             editPasswordBtn.onclick = () => showEditPasswordDialog(user);
             actions.appendChild(editPasswordBtn);
-            
+
+            // Delete own account (only for the current user)
+            if (user.id === currentUser.id) {
+                const deleteSelfBtn = createEl('button', 'btn btn-danger btn-sm');
+                deleteSelfBtn.textContent = 'Delete User';
+                deleteSelfBtn.onclick = () => _showDeleteSelfDialog(user);
+                actions.appendChild(deleteSelfBtn);
+            }
+
             // Delete Username button (only for other users)
             if (user.id !== currentUser.id ) {
                 const deleteUsernameBtn = createEl('button', 'btn btn-outline-danger btn-sm');
@@ -1266,6 +1274,78 @@ function renderUsersManagementTab(container) {
     }
     
     container.appendChild(section);
+}
+
+/**
+ * Confirmation dialog before deleting own account and logging out
+ */
+function _showDeleteSelfDialog(user) {
+    const overlay = createEl('div', 'modal-overlay');
+    const dialog  = createEl('div', 'modal-dialog');
+
+    const title = createEl('h3');
+    title.textContent = 'Delete Your Account';
+    title.style.cssText = 'margin:0 0 10px; color:#dc3545;';
+
+    const warning = createEl('p');
+    warning.innerHTML = `<strong>This action is permanent and cannot be undone.</strong><br><br>
+        Deleting your account will:<br>
+        &bull; Permanently remove your profile and credentials<br>
+        &bull; Delete all your marking schemes and student records<br>
+        &bull; Immediately log you out<br><br>
+        Are you sure you want to delete <strong>${user.username || user.email}</strong>?`;
+    warning.style.cssText = 'font-size:14px; line-height:1.6; color:var(--text-primary); margin:0 0 20px;';
+
+    // Confirmation input — user must type DELETE
+    const confirmLabel = createEl('label');
+    confirmLabel.textContent = 'Type DELETE to confirm:';
+    confirmLabel.style.cssText = 'font-size:13px; font-weight:600; display:block; margin-bottom:6px;';
+
+    const confirmInput = createEl('input', 'form-control');
+    confirmInput.placeholder = 'DELETE';
+    confirmInput.style.marginBottom = '16px';
+
+    const btnRow = createEl('div', 'form-buttons');
+
+    const cancelBtn = createEl('button', 'btn btn-secondary');
+    cancelBtn.textContent = 'Cancel';
+    cancelBtn.onclick = () => overlay.remove();
+
+    const deleteBtn = createEl('button', 'btn btn-danger');
+    deleteBtn.textContent = 'Delete My Account';
+    deleteBtn.disabled = true;
+
+    confirmInput.oninput = () => {
+        deleteBtn.disabled = confirmInput.value.trim() !== 'DELETE';
+    };
+
+    deleteBtn.onclick = async () => {
+        deleteBtn.disabled = true;
+        deleteBtn.textContent = 'Deleting…';
+        try {
+            deleteUser(user.id);
+            overlay.remove();
+            showNotification('Account deleted. Logging out…', 'warning', 3000);
+            setTimeout(() => logoutUser(), 1500);
+        } catch (err) {
+            showNotification('Failed to delete account. Please try again.', 'error');
+            deleteBtn.disabled = false;
+            deleteBtn.textContent = 'Delete My Account';
+        }
+    };
+
+    btnRow.appendChild(cancelBtn);
+    btnRow.appendChild(deleteBtn);
+
+    dialog.appendChild(title);
+    dialog.appendChild(warning);
+    dialog.appendChild(confirmLabel);
+    dialog.appendChild(confirmInput);
+    dialog.appendChild(btnRow);
+    overlay.appendChild(dialog);
+    document.body.appendChild(overlay);
+
+    overlay.onclick = (e) => { if (e.target === overlay) overlay.remove(); };
 }
 
 /**
