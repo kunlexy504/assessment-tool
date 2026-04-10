@@ -2766,3 +2766,212 @@ body.dark-mode .terms-modal-body h3 {
         padding: 12px 16px;
     }
 }
+
+/* =====================================
+   COOKIE CONSENT BANNER
+   ===================================== */
+
+.cookie-banner {
+    position: fixed;
+    bottom: 52px; /* sits just above the footer */
+    left: 16px;
+    right: 16px;
+    z-index: 90;
+    background: #1a1a2e;
+    color: #f0f0f0;
+    border-radius: 12px;
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.35);
+    animation: cookie-slide-up 0.4s ease;
+    max-width: 960px;
+    margin: 0 auto;
+}
+
+@keyframes cookie-slide-up {
+    from { transform: translateY(30px); opacity: 0; }
+    to   { transform: translateY(0);    opacity: 1; }
+}
+
+.cookie-banner-left {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    flex: 1;
+    min-width: 220px;
+}
+
+.cookie-icon { font-size: 22px; flex-shrink: 0; margin-top: 2px; }
+
+.cookie-banner-text strong {
+    font-size: 14px;
+    font-weight: 600;
+    display: block;
+    margin-bottom: 4px;
+    color: #fff;
+}
+
+.cookie-banner-text p {
+    font-size: 12px;
+    color: #b0b8c8;
+    margin: 0;
+    line-height: 1.5;
+}
+
+.cookie-banner-actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+.cookie-btn {
+    border: none;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    padding: 8px 14px;
+    cursor: pointer;
+    transition: opacity 0.2s, transform 0.15s;
+    white-space: nowrap;
+}
+.cookie-btn:hover { opacity: 0.88; transform: translateY(-1px); }
+
+.cookie-btn--accept   { background: #0066cc; color: #fff; }
+.cookie-btn--reject   { background: #3a3a4a; color: #d0d0d0; }
+.cookie-btn--settings { background: transparent; color: #7eb3f5; border: 1px solid #3a4a6a; }
+
+/* ── Cookie Category Cards ── */
+.cookie-category {
+    border: 1px solid var(--border-color, #e8eaed);
+    border-radius: 8px;
+    padding: 14px 16px;
+    margin: 14px 0;
+}
+
+.cookie-category-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.cookie-category-header strong {
+    font-size: 14px;
+    font-weight: 600;
+    display: block;
+    margin-bottom: 4px;
+}
+
+.cookie-category-header p {
+    font-size: 12.5px;
+    color: var(--text-secondary, #666);
+    margin: 0;
+    line-height: 1.5;
+}
+
+.cookie-always-on {
+    font-size: 11px;
+    font-weight: 600;
+    color: #28a745;
+    background: rgba(40,167,69,0.1);
+    border-radius: 20px;
+    padding: 3px 10px;
+    white-space: nowrap;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.cookie-detail-list {
+    margin: 10px 0 0 0;
+    padding-left: 18px;
+    font-size: 12.5px;
+    color: var(--text-secondary, #555);
+    line-height: 1.6;
+}
+.cookie-detail-list li { margin-bottom: 3px; }
+
+/* ── Cookie Toggle Switch ── */
+.cookie-toggle-label {
+    position: relative;
+    display: inline-block;
+    width: 44px;
+    height: 24px;
+    flex-shrink: 0;
+    margin-top: 2px;
+    cursor: pointer;
+}
+
+.cookie-toggle-input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+    position: absolute;
+}
+
+.cookie-toggle-track {
+    position: absolute;
+    inset: 0;
+    background: #ccc;
+    border-radius: 999px;
+    transition: background 0.25s;
+}
+
+.cookie-toggle-track::after {
+    content: '';
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 18px;
+    height: 18px;
+    background: #fff;
+    border-radius: 50%;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    transition: transform 0.25s;
+}
+
+.cookie-toggle-input:checked + .cookie-toggle-track {
+    background: #0066cc;
+}
+
+.cookie-toggle-input:checked + .cookie-toggle-track::after {
+    transform: translateX(20px);
+}
+
+/* ── Dark mode ── */
+body.dark-mode .cookie-category {
+    border-color: #3a3a4a;
+}
+body.dark-mode .cookie-category-header p,
+body.dark-mode .cookie-detail-list {
+    color: #9aa0aa;
+}
+
+/* ── Mobile ── */
+@media (max-width: 600px) {
+    .cookie-banner {
+        bottom: 48px;
+        left: 8px;
+        right: 8px;
+        padding: 12px 14px;
+        gap: 12px;
+    }
+
+    .cookie-banner-text strong { font-size: 13px; }
+    .cookie-banner-text p      { font-size: 11px; }
+
+    .cookie-btn {
+        font-size: 12px;
+        padding: 7px 11px;
+    }
+
+    .cookie-banner-actions {
+        width: 100%;
+        justify-content: flex-end;
+    }
+}

@@ -171,5 +171,157 @@
 
     <!-- Firebase module — bootstraps the app via onAuthStateChanged -->
     <script type="module" src="js/firebase-config.js"></script>
+
+    <!-- ── Cookie Consent Banner ── -->
+    <div id="cookie-banner" class="cookie-banner" style="display:none;" role="dialog" aria-label="Cookie consent">
+        <div class="cookie-banner-left">
+            <span class="cookie-icon">🍪</span>
+            <div class="cookie-banner-text">
+                <strong>We use cookies</strong>
+                <p>We use essential cookies to keep the app running and optional cookies to improve your experience. You can choose what to allow.</p>
+            </div>
+        </div>
+        <div class="cookie-banner-actions">
+            <button class="cookie-btn cookie-btn--settings" onclick="openCookieSettings()">Manage Preferences</button>
+            <button class="cookie-btn cookie-btn--reject"   onclick="cookieRejectAll()">Reject All</button>
+            <button class="cookie-btn cookie-btn--accept"   onclick="cookieAcceptAll()">Accept All</button>
+        </div>
+    </div>
+
+    <!-- ── Cookie Settings Modal ── -->
+    <div id="cookie-modal" class="terms-modal-overlay" style="display:none;" onclick="if(event.target===this) closeCookieSettings()">
+        <div class="terms-modal-box">
+            <div class="terms-modal-header">
+                <h2>🍪 Cookie Preferences</h2>
+                <button class="terms-modal-close" onclick="closeCookieSettings()" aria-label="Close">&times;</button>
+            </div>
+            <div class="terms-modal-body">
+                <p>Choose which cookies you allow. Your choice is saved in your browser and can be changed at any time.</p>
+
+                <!-- Strictly Necessary -->
+                <div class="cookie-category">
+                    <div class="cookie-category-header">
+                        <div>
+                            <strong>Strictly Necessary</strong>
+                            <p>These cookies are required for the app to function. They manage your login session, app security, and core functionality. They cannot be disabled.</p>
+                        </div>
+                        <span class="cookie-always-on">Always On</span>
+                    </div>
+                    <ul class="cookie-detail-list">
+                        <li><strong>Firebase Authentication</strong> — Keeps you logged in securely across sessions.</li>
+                        <li><strong>Session Management</strong> — Tracks your active session and auto-logout timer.</li>
+                        <li><strong>App Security</strong> — Protects against cross-site request forgery (CSRF) and other threats.</li>
+                    </ul>
+                </div>
+
+                <!-- Functional -->
+                <div class="cookie-category">
+                    <div class="cookie-category-header">
+                        <div>
+                            <strong>Functional Cookies</strong>
+                            <p>These cookies remember your preferences to personalise your experience, such as dark mode and display settings.</p>
+                        </div>
+                        <label class="cookie-toggle-label">
+                            <input type="checkbox" id="cookie-functional" class="cookie-toggle-input">
+                            <span class="cookie-toggle-track"></span>
+                        </label>
+                    </div>
+                    <ul class="cookie-detail-list">
+                        <li><strong>Theme Preference</strong> — Remembers your dark/light mode selection.</li>
+                        <li><strong>UI Settings</strong> — Stores layout and display preferences (e.g. word limit, session timeout).</li>
+                        <li><strong>Unsaved Work</strong> — Temporarily stores in-progress assessments so they are not lost on accidental logout.</li>
+                    </ul>
+                </div>
+
+                <!-- Analytics -->
+                <div class="cookie-category">
+                    <div class="cookie-category-header">
+                        <div>
+                            <strong>Analytics Cookies</strong>
+                            <p>These cookies help us understand how the app is used so we can improve it. No personally identifiable information is collected.</p>
+                        </div>
+                        <label class="cookie-toggle-label">
+                            <input type="checkbox" id="cookie-analytics" class="cookie-toggle-input">
+                            <span class="cookie-toggle-track"></span>
+                        </label>
+                    </div>
+                    <ul class="cookie-detail-list">
+                        <li><strong>Firebase Analytics</strong> — Tracks general usage patterns (pages visited, feature use frequency).</li>
+                        <li><strong>Performance Monitoring</strong> — Logs load times and errors to help diagnose technical issues.</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="terms-modal-footer" style="gap:10px; justify-content:space-between; flex-wrap:wrap;">
+                <button class="btn btn-secondary" onclick="cookieRejectAll(); closeCookieSettings()">Reject All</button>
+                <div style="display:flex; gap:10px;">
+                    <button class="btn btn-secondary" onclick="closeCookieSettings()">Cancel</button>
+                    <button class="btn btn-primary"   onclick="cookieSavePreferences()">Save Preferences</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ── Cookie Consent Logic ──────────────────────────────────────────
+        const COOKIE_KEY = 'lat_cookie_consent';
+
+        function _loadConsent() {
+            try { return JSON.parse(localStorage.getItem(COOKIE_KEY)); } catch { return null; }
+        }
+
+        function _saveConsent(prefs) {
+            localStorage.setItem(COOKIE_KEY, JSON.stringify({ ...prefs, timestamp: Date.now() }));
+        }
+
+        function _initCookieBanner() {
+            const consent = _loadConsent();
+            if (!consent) {
+                setTimeout(() => {
+                    document.getElementById('cookie-banner').style.display = 'flex';
+                }, 800);
+            }
+        }
+
+        function cookieAcceptAll() {
+            _saveConsent({ necessary: true, functional: true, analytics: true });
+            document.getElementById('cookie-banner').style.display = 'none';
+        }
+
+        function cookieRejectAll() {
+            _saveConsent({ necessary: true, functional: false, analytics: false });
+            document.getElementById('cookie-banner').style.display = 'none';
+        }
+
+        function openCookieSettings() {
+            const consent = _loadConsent() || {};
+            document.getElementById('cookie-functional').checked = consent.functional !== false;
+            document.getElementById('cookie-analytics').checked  = consent.analytics  === true;
+            document.getElementById('cookie-modal').style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeCookieSettings() {
+            document.getElementById('cookie-modal').style.display = 'none';
+            document.body.style.overflow = '';
+        }
+
+        function cookieSavePreferences() {
+            const functional = document.getElementById('cookie-functional').checked;
+            const analytics  = document.getElementById('cookie-analytics').checked;
+            _saveConsent({ necessary: true, functional, analytics });
+            document.getElementById('cookie-banner').style.display = 'none';
+            closeCookieSettings();
+        }
+
+        // Expose re-open for settings page use
+        window.openCookieSettings = openCookieSettings;
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') closeCookieSettings();
+        });
+
+        // Init on load
+        _initCookieBanner();
+    </script>
 </body>
 </html>
