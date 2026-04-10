@@ -1677,7 +1677,7 @@ function renderSettingsTab(container) {
     // Session timeout setting
     const timeoutDiv = createEl('div', 'setting-item');
     const timeoutLabel = createEl('label');
-    timeoutLabel.textContent = `Session Timeout (seconds, current: ${settings.sessionTimeoutSeconds || 30})`;
+    timeoutLabel.textContent = 'Session Timeout (Min 30-Sec)';
     timeoutDiv.appendChild(timeoutLabel);
     const timeoutInput = createEl('input', '', { type: 'number', min: '30', max: '7200' });
     timeoutInput.value = settings.sessionTimeoutSeconds || 30;
@@ -1685,7 +1685,6 @@ function renderSettingsTab(container) {
         const val = parseInt(timeoutInput.value);
         if (val >= 30 && val <= 7200) {
             updateSettings({ sessionTimeoutSeconds: val });
-            timeoutLabel.textContent = `Session Timeout (seconds, current: ${val})`;
             showNotification(`Session timeout updated to ${val} seconds`, 'success');
             initSessionTimeout(); // apply new value immediately
         } else {
