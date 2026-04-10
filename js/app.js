@@ -1314,7 +1314,18 @@ function showEditProfileDialog(user) {
     createdInput.readOnly = true;
     createdGroup.appendChild(createdLabel);
     createdGroup.appendChild(createdInput);
-    
+
+    // Email display (read-only)
+    const emailGroup = createEl('div', 'form-group');
+    const emailLabel = createEl('label');
+    emailLabel.textContent = 'Email';
+    const emailInput = createEl('input', 'form-control');
+    emailInput.type = 'text';
+    emailInput.value = user.email || 'No email on record';
+    emailInput.readOnly = true;
+    emailGroup.appendChild(emailLabel);
+    emailGroup.appendChild(emailInput);
+
     // Avatar selector
     let selectedAvatarId = user.avatar || 'av1';
 
@@ -1352,6 +1363,7 @@ function showEditProfileDialog(user) {
 
     form.appendChild(avatarGroup);
     form.appendChild(usernameGroup);
+    form.appendChild(emailGroup);
     form.appendChild(lastLoginGroup);
     form.appendChild(createdGroup);
 
