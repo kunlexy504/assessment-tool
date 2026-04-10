@@ -313,15 +313,13 @@
             closeCookieSettings();
         }
 
-        // Expose re-open for settings page use
-        window.openCookieSettings = openCookieSettings;
+        // Expose functions globally
+        window.openCookieSettings  = openCookieSettings;
+        window._initCookieBanner   = _initCookieBanner;  // called after login
 
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') closeCookieSettings();
         });
-
-        // Init on load
-        _initCookieBanner();
     </script>
 </body>
 </html>

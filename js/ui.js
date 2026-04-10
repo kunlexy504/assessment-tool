@@ -587,6 +587,7 @@ function renderPasswordResetPage() {
 function renderBackendPanel() {
     renderAppHeader();
     showFooter();
+    if (typeof window._initCookieBanner === 'function') window._initCookieBanner();
     const app = document.getElementById('app-content');
     clearElement(app);
     // Start (or restart) inactivity timeout when the panel loads
