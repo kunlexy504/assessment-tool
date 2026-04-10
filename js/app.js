@@ -549,14 +549,11 @@ function handlePreviousLO() {
  */
 function handleSaveAssessment() {
     const result = saveAssessmentResults();
-    
+
     if (result) {
         showNotification('Assessment saved successfully', 'success');
-        
         setTimeout(() => {
-            clearAssessmentSession();
-            renderBackendPanel();
-            showBackendTab('students');
+            renderAssessmentSummary();
         }, 500);
     }
 }
