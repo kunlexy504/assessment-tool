@@ -101,6 +101,16 @@ function hideAppHeader() {
     if (headerEl) { headerEl.style.display = 'none'; clearElement(headerEl); }
 }
 
+function showFooter() {
+    const f = document.querySelector('.app-footer');
+    if (f) f.style.display = '';
+}
+
+function hideFooter() {
+    const f = document.querySelector('.app-footer');
+    if (f) f.style.display = 'none';
+}
+
 // =====================================================
 // PAGE RENDERING FUNCTIONS
 // =====================================================
@@ -110,6 +120,7 @@ function hideAppHeader() {
  */
 function renderLoginPage() {
     hideAppHeader();
+    hideFooter();
     const app = document.getElementById('app-content');
     clearElement(app);
     // Clear any running inactivity timer on logout/login page
@@ -402,6 +413,7 @@ function showChangePasswordDialog(user) {
  */
 function renderRegistrationPage() {
     hideAppHeader();
+    hideFooter();
     const app = document.getElementById('app-content');
     clearElement(app);
     
@@ -496,6 +508,7 @@ function renderRegistrationPage() {
  */
 function renderPasswordResetPage() {
     hideAppHeader();
+    hideFooter();
     const app = document.getElementById('app-content');
     clearElement(app);
 
@@ -571,6 +584,7 @@ function renderPasswordResetPage() {
  */
 function renderBackendPanel() {
     renderAppHeader();
+    showFooter();
     const app = document.getElementById('app-content');
     clearElement(app);
     // Start (or restart) inactivity timeout when the panel loads
