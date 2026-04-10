@@ -4,7 +4,7 @@
  */
 
 // API key is set in js/firebase-config.js (gitignored) as window._groqApiKey
-const GROQ_API_KEY   = window._groqApiKey || '';
+// NOTE: read at call time (not load time) — firebase-config.js runs after this script
 const GROQ_URL       = 'https://api.groq.com/openai/v1/chat/completions';
 const GROQ_MODEL     = 'llama-3.1-8b-instant';
 const FF_COOLDOWN_MS = 30000; // 30-second cooldown between requests per student
@@ -88,7 +88,7 @@ async function _callGroq(assessmentData, wordLimit) {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${GROQ_API_KEY}`
+                'Authorization': `Bearer ${window._groqApiKey || ''}`
             },
             body: JSON.stringify({
                 model: GROQ_MODEL,
